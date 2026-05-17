@@ -1,0 +1,44 @@
+clc; clear; close all;
+rng(42);
+
+% Input and target
+X = [0 0 1; 0 1 1; 1 0 1; 1 1 1];
+D = [0;0;1;1];
+
+eta = 0.1; epochs = 200;
+
+% Initial weights
+w_sgd = zeros(3,1);
+w_bat = zeros(3,1);
+
+sgd_mse = zeros(epochs,1);
+bat_mse = zeros(epochs,1);
+
+for e = 1:epochs
+
+    % ----- SGD -----
+    for i = 1:4
+        w_sgd = w_sgd + eta*(D(i) - X(i,:)*w_sgd)*X(i,:)';
+    end
+    sgd_mse(e) = mean((D - X*w_sgd).^2);
+
+    % ----- Batch -----
+    Y = X*w_bat;
+    w_bat = w_bat + eta*(X'*(D - Y))/4;
+    bat_mse(e) = mean((D - X*w_bat).^2);
+end
+
+% Results
+disp('SGD Weights:'); disp(w_sgd')
+disp('Batch Weights:'); disp(w_bat')
+
+disp('SGD Final MSE:'); disp(sgd_mse(end))
+disp('Batch Final MSE:'); disp(bat_mse(end))
+
+% Plot comparison
+semilogy(sgd_mse,'LineWidth',2); hold on;
+semilogy(bat_mse,'LineWidth',2);
+grid on;
+xlabel('Epoch'); ylabel('MSE (log scale)');
+title('SGD vs Batch — Delta Learning Rule');
+legend('SGD','Batch');

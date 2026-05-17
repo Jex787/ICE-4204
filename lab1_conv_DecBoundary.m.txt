@@ -1,0 +1,54 @@
+clc; clear; close all;
+
+% Data (AND gate)
+X = [-1 -1; -1 1; 1 -1; 1 1];
+T = [-1; -1; -1; 1];
+
+% Initialize
+w = [0; 0];
+b = 0;
+eta = 0.1;
+
+errors = [];
+
+% Training
+for epoch = 1:20
+    err = 0;
+
+    for i = 1:4
+        y = sign(X(i,:) * w + b);
+        if y == 0, y = -1; end
+
+        if y ~= T(i)
+            w = w + eta * T(i) * X(i,:)';
+            b = b + eta * T(i);
+            err = err + 1;
+        end
+    end
+
+    errors(end+1) = err;
+    if err == 0, break; end
+end
+
+% Results
+disp('Final Weights:'); disp(w);
+disp('Final Bias:'); disp(b);
+
+% Convergence plot
+figure;
+plot(errors,'o-','LineWidth',2);
+grid on;
+xlabel('Epoch'); ylabel('Errors');
+title('Convergence Curve');
+
+% Decision boundary
+figure;
+scatter(X(:,1), X(:,2), 100, T, 'filled'); hold on;
+
+x = linspace(-2,2,100);
+y = (-w(1)*x - b)/w(2);
+plot(x,y,'k--','LineWidth',2);
+
+grid on;
+xlabel('X1'); ylabel('X2');
+title('AND Decision Boundary');

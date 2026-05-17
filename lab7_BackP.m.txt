@@ -1,0 +1,62 @@
+clc; clear;
+
+% Inputs and targets
+x1=0.05; x2=0.10;
+T1=0.01; T2=0.99;
+
+% Initial weights
+w1=0.15; w2=0.20; w3=0.25; w4=0.30;
+w5=0.40; w6=0.45; w7=0.50; w8=0.55;
+b1=0.35; b2=0.60;
+
+sig=@(z) 1./(1+exp(-z));
+
+eta=0.5;
+
+% -------- Forward pass (initial) --------
+H1=sig(w1*x1+w2*x2+b1);
+H2=sig(w3*x1+w4*x2+b1);
+
+Y1=sig(w5*H1+w6*H2+b2);
+Y2=sig(w7*H1+w8*H2+b2);
+
+E=0.5*((T1-Y1)^2+(T2-Y2)^2);
+
+% -------- Backprop --------
+d1=(Y1-T1)*Y1*(1-Y1);
+d2=(Y2-T2)*Y2*(1-Y2);
+
+h1=(w5*d1+w7*d2)*H1*(1-H1);
+h2=(w6*d1+w8*d2)*H2*(1-H2);
+
+% -------- Update weights --------
+w5=w5-eta*d1*H1;
+w6=w6-eta*d1*H2;
+w7=w7-eta*d2*H1;
+w8=w8-eta*d2*H2;
+b2=b2-eta*(d1+d2);
+
+w1=w1-eta*h1*x1;
+w2=w2-eta*h1*x2;
+w3=w3-eta*h2*x1;
+w4=w4-eta*h2*x2;
+b1=b1-eta*(h1+h2);
+
+% -------- Final forward pass --------
+H1=sig(w1*x1+w2*x2+b1);
+H2=sig(w3*x1+w4*x2+b1);
+
+Y1=sig(w5*H1+w6*H2+b2);
+Y2=sig(w7*H1+w8*H2+b2);
+
+E=0.5*((T1-Y1)^2+(T2-Y2)^2);
+
+% -------- Output --------
+fprintf('H1=%.5f\nH2=%.5f\n',H1,H2);
+fprintf('Y1=%.5f\nY2=%.5f\n',Y1,Y2);
+fprintf('Error=%.6f\n',E);
+
+fprintf('\nUpdated Weights:\n');
+fprintf('w1=%.5f w2=%.5f w3=%.5f w4=%.5f\n',w1,w2,w3,w4);
+fprintf('w5=%.5f w6=%.5f w7=%.5f w8=%.5f\n',w5,w6,w7,w8);
+fprintf('b1=%.5f b2=%.5f\n',b1,b2);

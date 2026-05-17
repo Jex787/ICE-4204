@@ -1,0 +1,30 @@
+clc; clear; close all;
+
+% Input and target data
+X = [0 0 1; 0 1 1; 1 0 1; 1 1 1];
+D = [0;0;1;1];
+
+% Initialize weights and parameters
+w = zeros(3,1); 
+eta = 0.1;
+mse = zeros(100,1);
+
+% Training using Stochastic Gradient Descent (Widrow-Hoff rule)
+for e = 1:100
+    for i = 1:4
+        w = w + eta*(D(i) - X(i,:)*w)*X(i,:)';
+    end
+    
+    % Compute MSE for each epoch
+    mse(e) = mean((D - X*w).^2);
+end
+
+% Display results
+disp('Final Weights:'); disp(w)
+disp('Predictions:'); disp(X*w)
+fprintf('Final MSE = %.8f\n', mse(end));
+
+% Plot learning curve
+semilogy(mse,'LineWidth',2); grid on
+xlabel('Epoch'); ylabel('MSE')
+title('SGD Widrow-Hoff Learning Curve')

@@ -1,0 +1,28 @@
+clc; clear; close all;
+rng(42);
+
+% Input and target data
+X = [0 0 1; 0 1 1; 1 0 1; 1 1 1];
+D = [0;0;1;1];
+
+% Initialize weights and parameters
+w = zeros(3,1); eta = 0.5;
+mse = zeros(100,1);
+
+% Batch Widrow-Hoff training
+for i = 1:100
+    Y = X*w;
+    w = w + eta*(X'*(D - Y))/4;
+    mse(i) = mean((D - Y).^2);
+end
+
+% Results
+disp('Weights:'); disp(round(w',4));
+disp('Predictions:'); disp(round((X*w)',4));
+disp('Targets:'); disp(D');
+
+% Learning curve
+semilogy(mse,'b','LineWidth',1.5);
+grid on;
+xlabel('Epoch'); ylabel('MSE');
+title('Batch Widrow-Hoff Learning Curve')
